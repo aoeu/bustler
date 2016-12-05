@@ -4,13 +4,11 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,7 +19,6 @@ public class Main extends ListActivity {
 
   class App {
     final CharSequence name;
-    final Drawable logo;
     final String className;
     final String packageName;
 
@@ -29,7 +26,6 @@ public class Main extends ListActivity {
       this.name = a.loadLabel(getPackageManager());
       this.className = a.className;
       this.packageName = a.packageName;
-      this.logo = a.loadIcon(getPackageManager());
     }
   }
 
@@ -52,7 +48,6 @@ public class Main extends ListActivity {
       App app = apps.get(index);
       if (app == null) return v;
       ((TextView)v.findViewById(R.id.appName)).setText(app.name);
-      ((ImageView)v.findViewById(R.id.appLogo)).setImageDrawable(app.logo);
       return v;
     }
   }
