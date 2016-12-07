@@ -40,9 +40,9 @@ public class Main extends ListActivity {
     @Override
     public
     @NonNull
-    View getView(int index, View v, ViewGroup parent) {
+    View getView(int index, View v, @NonNull ViewGroup parent) {
       if (v == null) {
-        v = getLayoutInflater().inflate(R.layout.app_list_item, null);
+        v = getLayoutInflater().inflate(R.layout.app_list_item, parent, false);
       }
       if (index >= apps.size()) return v;
       App app = apps.get(index);
