@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Main extends ListActivity {
@@ -114,6 +116,16 @@ public class Main extends ListActivity {
       if (a.isQuestionablyAnAppYetWasReportedByPackageManager()) continue;
       l.add(a);
     }
+    return sort(l);
+  }
+
+  static List<App> sort(List<App> l) {
+    Collections.sort(l, new Comparator<App>() {
+      @Override
+      public int compare(App a, App b) {
+        return a.colloquialName.value.compareTo(b.colloquialName.value);
+      }
+    });
     return l;
   }
 }
