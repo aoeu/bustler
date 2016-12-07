@@ -2,6 +2,7 @@ package aoeu.launcher;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,22 +18,38 @@ import java.util.List;
 
 public class Main extends ListActivity {
 
-  class App {
-    final CharSequence name;
-    final String className;
-    final String packageName;
-
-    App(ApplicationInfo a) {
-      this.name = a.loadLabel(getPackageManager());
-      this.className = a.className;
-      this.packageName = a.packageName;
+  class Value<Type> {
+    final Type value;
+    Value(Type value) {
+      this.value = value;
     }
   }
 
-  class Adapter extends ArrayAdapter<App> {
+  class Name extends Value<String> { Name(String s) { super(s); }}
+  class Package extends Value<String> { Package(String s) { super(s); }}
+
+  class App {
+    final Name colloquialName;
+    final Package javaPackage;
+
+    App(ApplicationInfo a) {
+      this.colloquialName = new Name(a.loadLabel(getPackageManager()).toString());
+      this.javaPackage = new Package(a.packageName);
+    }
+
+    Intent createIntentToLaunchMainActivity() {
+      return getPackageManager().getLaunchIntentForPackage(javaPackage.value);
+    }
+
+    void start() {
+      startActivity(createIntentToLaunchMainActivity());
+    }
+  }
+
+  class Apps extends ArrayAdapter<App> {
     List<App> apps;
 
-    Adapter(Context c, int resourceID, List<App> apps) {
+    Apps(Context c, int resourceID, List<App> apps) {
       super(c, resourceID, apps);
       this.apps = apps;
     }
@@ -42,34 +59,55 @@ public class Main extends ListActivity {
     @NonNull
     View getView(int index, View v, @NonNull ViewGroup parent) {
       if (v == null) {
-        v = getLayoutInflater().inflate(R.layout.app_list_item, parent, false);
+        v = inflateListItem(parent);
       }
       if (index >= apps.size()) return v;
       App app = apps.get(index);
       if (app == null) return v;
-      ((TextView)v.findViewById(R.id.appName)).setText(app.name);
+      getAppNameTextView(v).setText(app.colloquialName.value);
       return v;
     }
-  }
 
-  @Override public void onCreate(Bundle b) {
-    super.onCreate(b);
-    this.setContentView(R.layout.main);
-    this.setListAdapter(new Adapter(this, R.layout.app_list_item, initApps()));
-  }
-
-  @Override protected void onListItemClick(ListView l, View v, int index, long id) {
-    super.onListItemClick(l, v, index, id);
-    App a = (App)getListAdapter().getItem(index);
-    startActivity(getPackageManager().getLaunchIntentForPackage(a.packageName));
-  }
-
-  List<App> initApps() {
-    List<App> apps = new ArrayList<>();
-    for(ApplicationInfo a : getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA)) {
-      apps.add(new App(a));
+    App get(int index) {
+      return getItem(index);
     }
-    return apps;
+
+    View inflateListItem(ViewGroup parent) {
+      return getLayoutInflater().inflate(R.layout.app_list_item, parent, false);
+    }
+
+    TextView getAppNameTextView(View listItem) {
+      return ((TextView)listItem.findViewById(R.id.appName));
+    }
   }
 
+  Apps apps;
+
+  @Override
+  public
+  void onCreate(Bundle b) {
+    super.onCreate(b);
+    init();
+  }
+
+  @Override
+  protected
+  void onListItemClick(ListView l, View v, int index, long id) {
+    super.onListItemClick(l, v, index, id);
+    this.apps.get(index).start();
+  }
+
+  void init() {
+    setContentView(R.layout.main);
+    apps = new Apps(this, R.layout.app_list_item, createApps());
+    setListAdapter(apps);
+  }
+
+  List<App> createApps() {
+    List<App> l = new ArrayList<>();
+    for(ApplicationInfo a : getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA)) {
+      l.add(new App(a));
+    }
+    return l;
+  }
 }
