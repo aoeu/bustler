@@ -37,6 +37,10 @@ public class Main extends ListActivity {
       this.javaPackage = new Package(a.packageName);
     }
 
+    boolean isQuestionablyAnAppYetWasReportedByPackageManager() {
+      return colloquialName.value.equals(javaPackage.value);
+    }
+
     Intent createIntentToLaunchMainActivity() {
       return getPackageManager().getLaunchIntentForPackage(javaPackage.value);
     }
@@ -105,8 +109,10 @@ public class Main extends ListActivity {
 
   List<App> createApps() {
     List<App> l = new ArrayList<>();
-    for(ApplicationInfo a : getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA)) {
-      l.add(new App(a));
+    for(ApplicationInfo i : getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA)) {
+      App a = new App(i);
+      if (a.isQuestionablyAnAppYetWasReportedByPackageManager()) continue;
+      l.add(a);
     }
     return l;
   }
