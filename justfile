@@ -18,6 +18,4 @@ install:
 	$(adb) install -r $(apkPath)
 
 start:
-	$(adb) shell am start -n $(packageName)/$(packageName)$(mainActivityName)
-
-	
+	$(adb) shell am start -n $(packageName)/$(mainActivityName)
