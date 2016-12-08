@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">launcher</string>
+  <string name="app_name">Bustler</string>
 
   <string name="title_activity_main">Main</string>
   <string name="dummy_button">Dummy Button</string>
