@@ -3,8 +3,8 @@ package aoeu.bustler;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -20,6 +20,8 @@ import java.util.List;
 
 public class Main extends ListActivity {
 
+  PackageManager packageManager;
+
   class Value<Type> {
     final Type value;
     Value(Type value) {
@@ -34,17 +36,13 @@ public class Main extends ListActivity {
     final Name colloquialName;
     final Package javaPackage;
 
-    App(ApplicationInfo a) {
-      this.colloquialName = new Name(a.loadLabel(getPackageManager()).toString());
-      this.javaPackage = new Package(a.packageName);
-    }
-
-    boolean isQuestionablyAnAppYetWasReportedByPackageManager() {
-      return colloquialName.value.equals(javaPackage.value);
+    App(ResolveInfo i) {
+      this.colloquialName = new Name(i.loadLabel(packageManager).toString());
+      this.javaPackage = new Package(i.activityInfo.packageName);
     }
 
     Intent createIntentToLaunchMainActivity() {
-      return getPackageManager().getLaunchIntentForPackage(javaPackage.value);
+      return packageManager.getLaunchIntentForPackage(javaPackage.value);
     }
 
     void start() {
@@ -104,6 +102,7 @@ public class Main extends ListActivity {
   }
 
   void init() {
+    packageManager = getPackageManager();
     setContentView(R.layout.main);
     apps = new Apps(this, R.layout.app_list_item, createApps());
     setListAdapter(apps);
@@ -111,12 +110,18 @@ public class Main extends ListActivity {
 
   List<App> createApps() {
     List<App> l = new ArrayList<>();
-    for(ApplicationInfo i : getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA)) {
-      App a = new App(i);
-      if (a.isQuestionablyAnAppYetWasReportedByPackageManager()) continue;
-      l.add(a);
+    for(ResolveInfo i : getActivitiesThatCanBeLaunched()) {
+      l.add(new App(i));
     }
     return sort(l);
+  }
+
+  List<ResolveInfo> getActivitiesThatCanBeLaunched() {
+    final int bitwiseFlagsUsedAsQueryFilter = 0;
+    return packageManager.queryIntentActivities(
+        new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER),
+        bitwiseFlagsUsedAsQueryFilter
+    );
   }
 
   static List<App> sort(List<App> l) {
