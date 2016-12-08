@@ -1,6 +1,6 @@
 package aoeu.bustler;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,9 +16,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class Main extends ListActivity {
+public class Main extends Activity {
 
   PackageManager packageManager;
 
@@ -27,10 +29,18 @@ public class Main extends ListActivity {
     Value(Type value) {
       this.value = value;
     }
+    public boolean equals(Object o) {
+      return (o == this) ||  (o != null && getClass().isInstance(o) && ((Value)o).value.equals(value));
+    }
+    public int hashCode() {
+      return value.hashCode();
+    }
   }
 
-  class Name extends Value<String> { Name(String s) { super(s); }}
-  class Package extends Value<String> { Package(String s) { super(s); }}
+  class Runes extends Value<String> { Runes(String s) { super(s == null ? "" : s); }}
+
+  class Name extends Runes { Name(String s) { super(s); }}
+  class Package extends Runes { Package(String s) { super(s); }}
 
   class App {
     final Name colloquialName;
@@ -53,9 +63,13 @@ public class Main extends ListActivity {
   class Apps extends ArrayAdapter<App> {
     List<App> apps;
 
-    Apps(Context c, int resourceID, List<App> apps) {
-      super(c, resourceID, apps);
-      this.apps = apps;
+    Apps(List<App> a) {
+      this(Main.this, R.layout.app_list_item, a);
+    }
+
+    Apps(Context c, int resourceID, List<App> a) {
+      super(c, resourceID, a);
+      this.apps = a;
     }
 
     @Override
@@ -68,7 +82,14 @@ public class Main extends ListActivity {
       if (index >= apps.size()) return v;
       App app = apps.get(index);
       if (app == null) return v;
+      final int i = index;
       getAppNameTextView(v).setText(app.colloquialName.value);
+      v.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          apps.get(i).start();
+        }
+      });
       return v;
     }
 
@@ -84,9 +105,6 @@ public class Main extends ListActivity {
       return ((TextView)listItem.findViewById(R.id.appName));
     }
   }
-
-  Apps apps;
-
   @Override
   public
   void onCreate(Bundle b) {
@@ -94,18 +112,16 @@ public class Main extends ListActivity {
     init();
   }
 
-  @Override
-  protected
-  void onListItemClick(ListView l, View v, int index, long id) {
-    super.onListItemClick(l, v, index, id);
-    this.apps.get(index).start();
-  }
-
   void init() {
     packageManager = getPackageManager();
     setContentView(R.layout.main);
-    apps = new Apps(this, R.layout.app_list_item, createApps());
-    setListAdapter(apps);
+    List<App> a = createApps();
+    ((ListView)_(R.id.allApps)).setAdapter(new Apps(a));
+    ((ListView)_(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
+  }
+
+  View _(int ID) {
+    return findViewById(ID);
   }
 
   List<App> createApps() {
@@ -132,5 +148,21 @@ public class Main extends ListActivity {
       }
     });
     return l;
+  }
+
+  List<App> filter(List<App> l) {
+    Set<Name> p = new HashSet<>();
+    p.add(new Name("Signal"));
+    p.add(new Name("Firefox"));
+    p.add(new Name("Kiwix"));
+    p.add(new Name("Maps"));
+    p.add(new Name("Phone"));
+    p.add(new Name("Wikipedia"));
+
+    List<App> f = new ArrayList<>();
+    for (App a : l) {
+      if (p.contains(a.colloquialName)) f.add(a);
+    }
+    return f;
   }
 }
