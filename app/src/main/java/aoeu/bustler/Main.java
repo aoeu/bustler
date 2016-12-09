@@ -144,12 +144,15 @@ public class Main extends Activity {
 
   List<App> filter(List<App> l) {
     Set<Name> p = new HashSet<>();
+    p.add(new Name("Camera"));
     p.add(new Name("Signal"));
     p.add(new Name("Firefox"));
     p.add(new Name("Kiwix"));
     p.add(new Name("Maps"));
     p.add(new Name("Phone"));
     p.add(new Name("Wikipedia"));
+    p.add(new Name("Spotify"));
+    p.add(new Name("Inbox"));
 
     List<App> f = new ArrayList<>();
     for (App a : l) {
