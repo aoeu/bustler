@@ -107,7 +107,7 @@ public class Main extends Activity {
   void init() {
     packageManager = getPackageManager();
     setContentView(R.layout.main);
-    List<App> a = createApps();
+    List<App> a = newAppList();
     ((ListView)_(R.id.allApps)).setAdapter(new Apps(a));
     ((ListView)_(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
   }
@@ -116,7 +116,7 @@ public class Main extends Activity {
     return findViewById(ID);
   }
 
-  List<App> createApps() {
+  List<App> newAppList() {
     List<App> l = new ArrayList<>();
     for(ResolveInfo i : getActivitiesThatCanBeLaunched()) {
       l.add(new App(i));
