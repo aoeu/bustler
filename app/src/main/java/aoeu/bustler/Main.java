@@ -1,7 +1,6 @@
 package aoeu.bustler;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -64,11 +63,7 @@ public class Main extends Activity {
     List<App> apps;
 
     Apps(List<App> a) {
-      this(Main.this, R.layout.app_list_item, a);
-    }
-
-    Apps(Context c, int resourceID, List<App> a) {
-      super(c, resourceID, a);
+      super(Main.this, R.layout.app_list_item, a);
       this.apps = a;
     }
 
@@ -93,10 +88,6 @@ public class Main extends Activity {
       return v;
     }
 
-    App get(int index) {
-      return getItem(index);
-    }
-
     View inflateListItem(ViewGroup parent) {
       return getLayoutInflater().inflate(R.layout.app_list_item, parent, false);
     }
@@ -105,6 +96,7 @@ public class Main extends Activity {
       return ((TextView)listItem.findViewById(R.id.appName));
     }
   }
+
   @Override
   public
   void onCreate(Bundle b) {
