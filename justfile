@@ -2,6 +2,7 @@ device = $(shell adb devices | grep '[0-9]' | head -1 | cut -d'	' -f1)
 packageName = $(shell find */src -name AndroidManifest.xml | xargs xmllint -xpath 'string(//manifest/@package)')
 mainActivityName = $(shell find */src -name AndroidManifest.xml | xargs sed -e 's/android://g' | xmllint -xpath 'string(//activity[descendant::action[@name="android.intent.action.MAIN"]]/@name)' - )
 
+appID = $(shell grep applicationId */build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
 appName = app
 apkPath = $(appName)/build/outputs/apk/$(appName)-debug.apk
 adb = adb -s $(device)
@@ -18,4 +19,5 @@ install:
 	$(adb) install -r $(apkPath)
 
 start:
-	$(adb) shell am start -n $(packageName)/$(mainActivityName)
+	$(adb) shell am start -n $(appID)/$(packageName)$(mainActivityName)
+
