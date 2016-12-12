@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -22,6 +23,7 @@ import java.util.Set;
 public class Main extends Activity {
 
   PackageManager packageManager;
+  Typeface font;
 
   class Value<Type> {
     final Type value;
@@ -37,6 +39,8 @@ public class Main extends Activity {
   }
 
   class Runes extends Value<String> { Runes(String s) { super(s == null ? "" : s); }}
+
+  class AssetPath extends Runes { AssetPath(String s) { super(s); }}
 
   class Name extends Runes { Name(String s) { super(s); }}
   class Package extends Runes { Package(String s) { super(s); }}
@@ -77,14 +81,8 @@ public class Main extends Activity {
       if (index >= apps.size()) return v;
       App app = apps.get(index);
       if (app == null) return v;
-      final int i = index;
-      getAppNameTextView(v).setText(app.colloquialName.value);
-      v.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          apps.get(i).start();
-        }
-      });
+      setText(v, app.colloquialName);
+      setClickListener(v, index);
       return v;
     }
 
@@ -92,8 +90,20 @@ public class Main extends Activity {
       return getLayoutInflater().inflate(R.layout.app_list_item, parent, false);
     }
 
-    TextView getAppNameTextView(View listItem) {
-      return ((TextView)listItem.findViewById(R.id.appName));
+    void setText(View listItem, Name n) {
+      TextView v = ((TextView)listItem.findViewById(R.id.appName));
+      if (v == null) return;
+      v.setText(n.value);
+      v.setTypeface(font);
+    }
+
+    void setClickListener(View v, final int index) {
+      v.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          apps.get(index).start();
+        }
+      });
     }
   }
 
@@ -106,10 +116,19 @@ public class Main extends Activity {
 
   void init() {
     packageManager = getPackageManager();
+    font = getFont(new AssetPath("Go-Regular.ttf"));
     setContentView(R.layout.main);
     List<App> a = newAppList();
     ((ListView)_(R.id.allApps)).setAdapter(new Apps(a));
     ((ListView)_(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
+  }
+
+  Typeface getFont(AssetPath a) {
+    try {
+      return Typeface.createFromAsset(getAssets(), a.value);
+    } catch (RuntimeException exceptionForAssetPathNotFound) {
+      return Typeface.DEFAULT;
+    }
   }
 
   View _(int ID) {
