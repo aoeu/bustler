@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -73,8 +72,7 @@ public class Main extends Activity {
 
     @Override
     public
-    @NonNull
-    View getView(int index, View v, @NonNull ViewGroup parent) {
+    View getView(int index, View v, ViewGroup parent) {
       if (v == null) {
         v = inflateListItem(parent);
       }
