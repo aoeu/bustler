@@ -10,14 +10,14 @@
     android:id="@+id/allApps"
     android:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
     android:layout_height="wrap_content"
-    android:layout_weight="43"
+    android:layout_weight="46"
     tools:listitem="@layout/app_list_item"
     />
 
   <View
     android:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
     android:layout_height="wrap_content"
-    android:layout_weight="23"/>
+    android:layout_weight="20"/>
 
   <ListView
     android:id="@+id/prioritizedApps"
