@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="aoeu.bustler"
           xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-sdk
+    android:minSdkVersion="25"
+    android:targetSdkVersion="25" />
 
   <application
     android:allowBackup="true"
