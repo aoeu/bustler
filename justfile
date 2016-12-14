@@ -4,10 +4,13 @@ mainActivityName = $(shell find */src -name AndroidManifest.xml | xargs sed -e '
 
 appID = $(shell grep applicationId */build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
 appName = app
-apkPath = $(appName)/build/outputs/apk/$(appName)-debug.apk
+apkPath = $(appName).apk
 adb = adb -s $(device)
 
-default: assemble install start
+default: build install start
+
+build:
+	./build.sh 2>/dev/null
 
 assemble:
 	(./gradlew assembleDebug 2>&1 | grep -v '^:.*:.*' | grep -v 'incubating') 1>&2
@@ -19,5 +22,4 @@ install:
 	$(adb) install -r $(apkPath)
 
 start:
-	$(adb) shell am start -n $(appID)/$(packageName)$(mainActivityName)
-
+	$(adb) shell am start -n $(packageName)/$(packageName)$(mainActivityName)
