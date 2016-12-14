@@ -6,6 +6,7 @@ appID = $(shell grep applicationId */build.gradle | head -1 | sed 's/.*"\(.*\)".
 appName = app
 apkPath = $(appName)/build/outputs/apk/$(appName)-debug.apk
 adb = adb -s $(device)
+os = $(shell uname)
 
 default: assemble install start
 
@@ -21,3 +22,5 @@ install:
 start:
 	$(adb) shell am start -n $(appID)/$(packageName)$(mainActivityName)
 
+refreshCerts:
+	test $(os) = Linux && sudo apt-get install ca-certificates-java && sudo apt-get install ca-certificates-java
