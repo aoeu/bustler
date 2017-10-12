@@ -12,12 +12,6 @@ default: build install start
 build:
 	./build.sh 2>/dev/null
 
-assemble:
-	(./gradlew assembleDebug 2>&1 | grep -v '^:.*:.*' | grep -v 'incubating') 1>&2
-
-compile:
-	(./gradlew compileDebugJavaWithJavac 2>&1 | grep -v '^:.*:.*' | grep -v 'incubating') 1>&2
-
 install:
 	$(adb) install -r $(apkPath)
 

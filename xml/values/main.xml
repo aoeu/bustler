@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<declare-styleable name="ButtonBarContainerTheme">
+<attr name="metaButtonBarStyle" format="reference"/>
+<attr name="metaButtonBarButtonStyle" format="reference"/>
+</declare-styleable>
+
+<color name="colorPrimary">#FFFFEA</color>
+<color name="colorPrimaryDark">#EBFFFF</color>
+<color name="colorAccent">#EBFFFF</color>
+<color name="black_overlay">#66000000</color>
+
+<dimen name="mandatoryWidthForWeightedLayouts">0dp</dimen>
+
+<string name="app_name">Bustler</string>
+<string name="title_activity_main">Main</string>
+
+<style name="AppTheme">
+<item name="android:windowActionBar">false</item>
+<item name="android:windowNoTitle">true</item>
+<item name="android:textSize">24sp</item>
+<item name="android:textColor">@android:color/black</item>
+<item name="android:windowBackground">@color/colorPrimary</item>
+<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+<item name="android:windowLightStatusBar">true</item>
+</style>
+
+</resources>

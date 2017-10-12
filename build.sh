@@ -11,10 +11,10 @@ filepathOfUnalignedAPK="${filepathOfAPK}.unaligned"
 
 
 # Use the latest build tools version...
-buildTools=$sdk/build-tools/$(ls $sdk/build-tools | sort -n | tail -1)
+buildTools=$sdk/build-tools/$(/bin/ls $sdk/build-tools | sort -n | tail -1)
 
 # ...and the latest platform version.
-platform=$sdk/platforms/$(ls $sdk/platforms | sort -n |tail -1) 
+platform=$sdk/platforms/$(/bin/ls $sdk/platforms | sort -n |tail -1)
 
 
 androidLib=$platform/android.jar
@@ -22,8 +22,9 @@ androidLib=$platform/android.jar
 _aapt=$buildTools/aapt
 _dx=$buildTools/dx
 
-manifestFilepath=$(find */src/main -name AndroidManifest.xml)
-resourcesFilepath=$(find */src/main -name res)
+manifestFilepath=$PWD/AndroidManifest.xml
+resourcesFilepath=$PWD/xml
+javaSourcesFilepath=$PWD/java
 
 main() {
 	makeOutputDirs && \
@@ -34,7 +35,7 @@ main() {
 	addAndroidRuntimeBytecodeToAndroidApplicationPackage && \
 	signAndroidApplicationPackageWithDebugKey && \
 	alignUncompressedDataInZipFileToFourByteBoundariesForFasterMemoryMappingAtRuntime && \
-    cleanup
+	cleanup
 }
 
 makeOutputDirs() {
@@ -61,11 +62,11 @@ generateJavaFileForAndroidResources() {
 compileJavaSourceFilesToJavaVirtualMachineBytecode() {
 	javac \
 		-classpath "$androidLib" \
-		-sourcepath "*/src/main/java:$outputDirForGeneratedSourceFiles" \
+		-sourcepath "$javaSourcesFilepath:$outputDirForGeneratedSourceFiles" \
 		-d "$outputDirForBytecode" \
 		-target 1.7 \
 		-source 1.7 \
-		$(find */src/main/java -name '*.java') \
+		$(find $javaSourcesFilepath -name '*.java') \
 		$(find $outputDirForGeneratedSourceFiles -name '*.java')
 }
 
@@ -90,7 +91,7 @@ alignUncompressedDataInZipFileToFourByteBoundariesForFasterMemoryMappingAtRuntim
 }
 
 cleanup() {
-	trash "$outputDirForBytecode" "$outputDirForGeneratedSourceFiles" "$filepathOfUnalignedAPK" "$outputDexFilepath"
+	rm -rf "$outputDirForBytecode" "$outputDirForGeneratedSourceFiles" "$filepathOfUnalignedAPK" "$outputDexFilepath"
 }
 
 main
