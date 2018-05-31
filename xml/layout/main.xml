@@ -1,32 +1,31 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:_="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="horizontal"
-              android:weightSum="100"
+              _:layout_width="match_parent"
+              _:layout_height="match_parent"
+              _:orientation="horizontal"
+              _:weightSum="100"
               tools:context="aoeu.bustler.Main">
 
   <ListView
-    android:id="@+id/allApps"
-    android:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
-    android:layout_height="wrap_content"
-    android:layout_weight="46"
+    _:id="@+id/allApps"
+    _:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
+    _:layout_height="wrap_content"
+    _:layout_weight="46"
     tools:listitem="@layout/app_list_item"
     />
 
   <View
-    android:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
-    android:layout_height="wrap_content"
-    android:layout_weight="20"/>
+    _:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
+    _:layout_height="wrap_content"
+    _:layout_weight="20"/>
 
   <ListView
-    android:id="@+id/prioritizedApps"
-    android:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:layout_weight="34"
+    _:id="@+id/prioritizedApps"
+    _:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
+    _:layout_height="wrap_content"
+    _:layout_gravity="center_vertical"
+    _:layout_weight="34"
     tools:listitem="@layout/app_list_item"
     />
-
 
 </LinearLayout>
