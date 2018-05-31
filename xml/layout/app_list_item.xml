@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:_="http://schemas.android.com/apk/res/android"
-              _:orientation="horizontal"
-              _:layout_width="match_parent"
-              _:layout_height="wrap_content"
-              _:padding="6dp"
-              >
-  <TextView
-    _:id="@+id/appName"
-    _:layout_width="wrap_content"
-    _:layout_height="wrap_content"
-    />
 
-  <View
-    _:layout_width="0dp"
-    _:layout_height="wrap_content"
-    _:layout_weight="1"/>
+<LinearLayout
+xmlns:_="http://schemas.android.com/apk/res/android"
+_:orientation="horizontal"
+_:layout_width="match_parent"
+_:layout_height="wrap_content"
+_:padding="6dp"
+>
+
+<TextView
+_:id="@+id/appName"
+_:layout_width="wrap_content"
+_:layout_height="wrap_content"
+/>
+
+<View
+_:layout_width="0dp"
+_:layout_height="wrap_content"
+_:layout_weight="1"
+/>
 
 </LinearLayout>
