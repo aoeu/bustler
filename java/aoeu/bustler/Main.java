@@ -7,11 +7,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,10 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class Main extends Activity {
 
   PackageManager packageManager;
   Typeface font;
+  Set<Name> favoriteApps;
 
   class Value<Type> {
     final Type value;
@@ -43,6 +49,7 @@ public class Main extends Activity {
 
   class Name extends Runes { Name(String s) { super(s); }}
   class Package extends Runes { Package(String s) { super(s); }}
+  class Filename extends Runes { Filename(String s) { super(s); }}
 
   class App {
     final Name colloquialName;
@@ -103,6 +110,16 @@ public class Main extends Activity {
         }
       });
     }
+
+    void setLongClickListener(View v, final int index) {
+      v.setOnLongClickListener(new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+          // TODO: Implement
+          return true;
+        }
+      });
+    }
   }
 
   @Override
@@ -115,10 +132,11 @@ public class Main extends Activity {
   void init() {
     packageManager = getPackageManager();
     font = getFont(new AssetPath("Go-Regular.ttf"));
+    favoriteApps = loadFavoriteAppNames();
     setContentView(R.layout.main);
     List<App> a = newAppList();
-    ((ListView)_(R.id.allApps)).setAdapter(new Apps(a));
-    ((ListView)_(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
+    ((ListView) of(R.id.allApps)).setAdapter(new Apps(a));
+    ((ListView) of(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
   }
 
   Typeface getFont(AssetPath a) {
@@ -129,7 +147,7 @@ public class Main extends Activity {
     }
   }
 
-  View _(int ID) {
+  View of(int ID) {
     return findViewById(ID);
   }
 
@@ -159,21 +177,29 @@ public class Main extends Activity {
     return l;
   }
 
-  List<App> filter(List<App> l) {
-    Set<Name> p = new HashSet<>();
-    p.add(new Name("Camera"));
-    p.add(new Name("Signal"));
-    p.add(new Name("Firefox"));
-    p.add(new Name("Kiwix"));
-    p.add(new Name("Maps"));
-    p.add(new Name("Phone"));
-    p.add(new Name("Wikipedia"));
-    p.add(new Name("Spotify"));
-    p.add(new Name("Inbox"));
+  Set<Name> loadFavoriteAppNames() {
+    Set<Name> s = new HashSet<>();
+    for (String n : read(new Filename("/sdcard/apps.txt"))) {
+       s.add(new Name(n));
+     }
+     return s;
+  }
 
+  List<String> read(Filename f) {
+    try {
+      return Arrays.asList(
+        new String(Files.readAllBytes(Paths.get(f.value))).split("\n")
+      );
+    } catch (Exception ignored) {
+      android.util.Log.w("aoeu", "Couldn't favorite apps: " + ignored);
+      return new ArrayList<>();
+    }
+  }
+
+  List<App> filter(List<App> l) {
     List<App> f = new ArrayList<>();
     for (App a : l) {
-      if (p.contains(a.colloquialName)) f.add(a);
+      if (favoriteApps.contains(a.colloquialName)) f.add(a);
     }
     return f;
   }
