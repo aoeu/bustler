@@ -29,6 +29,7 @@ public class Main extends Activity {
   PackageManager packageManager;
   Typeface font;
   Set<Name> favoriteApps;
+  Filename savedFavorites = new Filename("/sdcard/apps.txt");
 
   class Value<Type> {
     final Type value;
@@ -88,6 +89,7 @@ public class Main extends Activity {
       if (app == null) return v;
       setText(v, app.colloquialName);
       setClickListener(v, index);
+      setLongClickListener(v, index);
       return v;
     }
 
@@ -115,7 +117,15 @@ public class Main extends Activity {
       v.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View view) {
-          // TODO: Implement
+          Name n = apps.get(index).colloquialName;
+          android.widget.Toast.makeText(Main.this, n.value, android.widget.Toast.LENGTH_LONG).show();
+          if (favoriteApps.contains(n)) {
+            favoriteApps.remove(n);
+          } else {
+            favoriteApps.add(n);
+          }
+          save(savedFavorites, favoriteApps);
+          prioritizedApps.notifyDataSetChanged();
           return true;
         }
       });
@@ -129,14 +139,17 @@ public class Main extends Activity {
     init();
   }
 
+  Apps prioritizedApps;
+
   void init() {
     packageManager = getPackageManager();
     font = getFont(new AssetPath("Go-Regular.ttf"));
-    favoriteApps = loadFavoriteAppNames();
+    favoriteApps = loadFavoriteAppNames(savedFavorites);
     setContentView(R.layout.main);
     List<App> a = newAppList();
     ((ListView) of(R.id.allApps)).setAdapter(new Apps(a));
-    ((ListView) of(R.id.prioritizedApps)).setAdapter(new Apps(filter(a)));
+    prioritizedApps = new Apps(filter(a));
+    ((ListView) of(R.id.prioritizedApps)).setAdapter(prioritizedApps);
   }
 
   Typeface getFont(AssetPath a) {
@@ -177,9 +190,9 @@ public class Main extends Activity {
     return l;
   }
 
-  Set<Name> loadFavoriteAppNames() {
+  Set<Name> loadFavoriteAppNames(Filename f ) {
     Set<Name> s = new HashSet<>();
-    for (String n : read(new Filename("/sdcard/apps.txt"))) {
+    for (String n : read(f)) {
        s.add(new Name(n));
      }
      return s;
@@ -190,9 +203,25 @@ public class Main extends Activity {
       return Arrays.asList(
         new String(Files.readAllBytes(Paths.get(f.value))).split("\n")
       );
-    } catch (Exception ignored) {
-      android.util.Log.w("aoeu", "Couldn't favorite apps: " + ignored);
+    } catch (Exception err) {
+      android.util.Log.w("aoeu", "Couldn't read favorite apps: " + err);
       return new ArrayList<>();
+    }
+  }
+
+  void save(Filename f, Set<Name> apps) {
+    String s = "";
+    for (Name n : apps) {
+      s += n.value + "\n";
+    }
+    write(f, s);
+  }
+
+  void write(Filename f, String s) {
+    try {
+      Files.write(Paths.get(f.value), s.getBytes());
+    } catch (Exception err) {
+      android.util.Log.w("aoeu", "Couldn't write favorite apps: " + err);
     }
   }
 
