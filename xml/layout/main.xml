@@ -16,14 +16,14 @@ _:layout_weight="46"
 <View
 _:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
 _:layout_height="wrap_content"
-_:layout_weight="20"/>
+_:layout_weight="10"/>
 
 <ListView
 _:id="@+id/prioritizedApps"
 _:layout_width="@dimen/mandatoryWidthForWeightedLayouts"
 _:layout_height="wrap_content"
 _:layout_gravity="center_vertical"
-_:layout_weight="34"
+_:layout_weight="44"
 />
 
 </LinearLayout>
