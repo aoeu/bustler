@@ -28,7 +28,7 @@ public class Main extends Activity {
 
   PackageManager packageManager;
   Typeface font;
-  Set<Name> favoriteApps;
+  Set<Name> favorites;
   Filename savedFavorites = new Filename("/sdcard/apps.txt");
 
   class Value<Type> {
@@ -71,11 +71,11 @@ public class Main extends Activity {
   }
 
   class Apps extends ArrayAdapter<App> {
-    List<App> apps;
+    List<App> values;
 
     Apps(List<App> a) {
       super(Main.this, R.layout.app_list_item, a);
-      this.apps = a;
+      this.values = a;
     }
 
     @Override
@@ -84,8 +84,8 @@ public class Main extends Activity {
       if (v == null) {
         v = inflateListItem(parent);
       }
-      if (index >= apps.size()) return v;
-      App app = apps.get(index);
+      if (index >= values.size()) return v;
+      App app = values.get(index);
       if (app == null) return v;
       setText(v, app.colloquialName);
       setClickListener(v, index);
@@ -108,7 +108,7 @@ public class Main extends Activity {
       v.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-          apps.get(index).start();
+          values.get(index).start();
         }
       });
     }
@@ -117,18 +117,29 @@ public class Main extends Activity {
       v.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View view) {
-          Name n = apps.get(index).colloquialName;
-          android.widget.Toast.makeText(Main.this, n.value, android.widget.Toast.LENGTH_LONG).show();
-          if (favoriteApps.contains(n)) {
-            favoriteApps.remove(n);
+          Name n = values.get(index).colloquialName;
+          if (favorites.contains(n)) {
+            favorites.remove(n);
           } else {
-            favoriteApps.add(n);
+            favorites.add(n);
           }
-          save(savedFavorites, favoriteApps);
-          prioritizedApps.notifyDataSetChanged();
+          save(savedFavorites, favorites);
+          prioritizedAppsView.setAdapter(allApps.filter(favorites));
           return true;
         }
       });
+    }
+
+    void toast(String s) {
+      android.widget.Toast.makeText(Main.this, s, android.widget.Toast.LENGTH_LONG).show();
+    }
+
+    Apps filter(Set<Name> s) {
+      List<App> f = new ArrayList<>();
+      for (App a : values) {
+        if (s.contains(a.colloquialName)) f.add(a);
+      }
+      return new Apps(f);
     }
   }
 
@@ -139,17 +150,18 @@ public class Main extends Activity {
     init();
   }
 
-  Apps prioritizedApps;
+  Apps allApps;
+  ListView prioritizedAppsView;
 
   void init() {
     packageManager = getPackageManager();
     font = getFont(new AssetPath("Go-Regular.ttf"));
-    favoriteApps = loadFavoriteAppNames(savedFavorites);
+    favorites = loadFavoriteAppNames(savedFavorites);
     setContentView(R.layout.main);
-    List<App> a = newAppList();
-    ((ListView) of(R.id.allApps)).setAdapter(new Apps(a));
-    prioritizedApps = new Apps(filter(a));
-    ((ListView) of(R.id.prioritizedApps)).setAdapter(prioritizedApps);
+    allApps = new Apps(newAppList());
+    ((ListView) of(R.id.allApps)).setAdapter(allApps);
+    prioritizedAppsView = (ListView) of(R.id.prioritizedApps);
+    prioritizedAppsView.setAdapter(allApps.filter(favorites));
   }
 
   Typeface getFont(AssetPath a) {
@@ -223,13 +235,5 @@ public class Main extends Activity {
     } catch (Exception err) {
       android.util.Log.w("aoeu", "Couldn't write favorite apps: " + err);
     }
-  }
-
-  List<App> filter(List<App> l) {
-    List<App> f = new ArrayList<>();
-    for (App a : l) {
-      if (favoriteApps.contains(a.colloquialName)) f.add(a);
-    }
-    return f;
   }
 }
